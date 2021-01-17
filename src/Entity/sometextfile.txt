@@ -1,0 +1,158 @@
+made changes in BlogController
+
+added a categoy
+
+added to_string in categoy
+
+added submit type in addblogtype
+
+
+
+_________________________________________
+
+
+we have :
+Entity : ResetPasswordRequest as it is 
+
+inside Category Entity :  
+we have : id, name , status , created , updated , | post relation type mappedBy categoryName
+
+and to set created and updated we have prepersist lifecycles  :
+
+// also add this above class:
+
+/**
+ * @ORM\Entity(repositoryClass=CategoryRepository::class)
+ * @ORM\HasLifecycleCallbacks()
+ */
+
+
+
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setCreatedValue () {
+        $this->created = new \DateTime();
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setUpdatedValue () {
+        $this->updated = new \DateTime();
+    }
+
+
+
+
+
+___________________________________________
+
+
+in Entity\Comment.php
+
+id , content , status , created , || commentBy ManyToOne(targetEntity=User::class, inversedBy="comments")
+                                   ||postTitle @ORM\ManyToOne(targetEntity=Post::class, inversedBy="comments")
+
+// setting prepersisit value for status , created , commentBy
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setCreatedValue () {
+        $this->created = new \DateTime();
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function getCommentByValue(): ?User
+    {
+        return $this->commentBy;
+    }
+     
+     /**
+     * @ORM\PrePersist
+     */
+    public function  setStatusValue(): ?User
+    {
+        $this->status=0;
+    }
+
+
+
+    _________________________________________________________________________________
+
+
+    Entity\Post.php
+
+    id 
+    title 
+    content
+    created
+    updated
+    status
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="posts")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    categoryName
+
+     /**
+     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="postTitle")
+     */
+    comments
+
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setCreatedValue () {
+        $this->created = new \DateTime();
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setUpdatedValue () {
+        $this->updated = new \DateTime();
+    }
+
+
+_________________________________________________________________________________
+
+
+Entity\User.php
+id
+email
+role
+password
+
+    /**
+     * @ORM\Column(type="string", columnDefinition="ENUM('pending', 'active', 'inactive', 'suspended')")
+     */
+status
+
+    /**
+     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="commentBy")
+     */
+comments
+
+
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setStatusValue () {
+        $this->status = 'pending';
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setRolesValue () {
+        $this->roles = ["ROLE_USER"];
+    }
+
